@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>사장님몰래 · 운영 대시보드</title>
+<title>유플리 · 운영 대시보드</title>
 <style>
   .viz-root {
     color-scheme: light;
@@ -65,7 +65,7 @@
 <body class="viz-root">
 <div class="wrap">
   <header>
-    <h1>사장님몰래 · 운영 대시보드</h1>
+    <h1>유플리 · 운영 대시보드</h1>
     <span class="sub" id="asof">불러오는 중…</span>
   </header>
 
@@ -87,7 +87,7 @@
     <div id="today-links" style="font-size:13px; color:var(--ink-2)">확인 중…</div>
     <div class="btnrow">
       <a class="btn danger" id="btn-stop" target="_blank" rel="noopener">⛔ 오늘 발행 중지 (이슈에 stop 댓글)</a>
-      <a class="btn" href="https://github.com/sajang-mollae/sajang-mollae.github.io/actions" target="_blank" rel="noopener">실행 로그</a>
+      <a class="btn" href="https://github.com/phone-mollae/phone-mollae.github.io/actions" target="_blank" rel="noopener">실행 로그</a>
     </div>
   </div>
 
@@ -101,20 +101,21 @@
     <div id="topics"></div>
     <div class="btnrow">
       <a class="btn primary" id="btn-add" target="_blank" rel="noopener">＋ 주제 추가</a>
-      <a class="btn" href="https://github.com/sajang-mollae/sajang-mollae.github.io/edit/main/topics.json" target="_blank" rel="noopener">직접 편집 (고급)</a>
+      <a class="btn" id="btn-design" target="_blank" rel="noopener">🎨 디자인 설정</a>
+      <a class="btn" href="https://github.com/phone-mollae/phone-mollae.github.io/edit/main/topics.json" target="_blank" rel="noopener">직접 편집 (고급)</a>
     </div>
     <div class="sub" style="margin-top:8px">주제 추가 버튼 → 양식이 채워진 이슈가 열립니다. 그대로 등록하면 자동으로 큐에 반영됩니다.</div>
   </div>
 
   <div class="card foot">
-    <a href="https://www.instagram.com/sajang.mollae/" target="_blank" rel="noopener">@sajang.mollae</a>
-    <a href="https://github.com/sajang-mollae/sajang-mollae.github.io" target="_blank" rel="noopener">저장소</a>
+    <a href="https://www.instagram.com/uplus_uply/" target="_blank" rel="noopener">@uplus_uply</a>
+    <a href="https://github.com/phone-mollae/phone-mollae.github.io" target="_blank" rel="noopener">저장소</a>
     <span id="runinfo"></span>
   </div>
 </div>
 
 <script>
-const REPO = 'sajang-mollae/sajang-mollae.github.io';
+const REPO = 'phone-mollae/phone-mollae.github.io';
 const kstDate = () => new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
 const fmt = n => n==null ? '–' : n.toLocaleString('ko-KR');
 const $ = id => document.getElementById(id);
@@ -124,10 +125,23 @@ const $ = id => document.getElementById(id);
   const body = encodeURIComponent(
 `아래 형식을 채워 그대로 등록하세요. 등록하면 자동으로 주제 큐(topics.json)에 추가됩니다.
 
-시리즈: MONEY CUT   (MONEY CUT / DATA CUT / COUNTER CUT 중 하나)
+시리즈: 신모델   (신모델 / 혜택 / 꿀팁 중 하나)
 주제: 여기에 주제 한 줄
 메모: (선택) 참고 링크나 방향`);
   $('btn-add').href = `https://github.com/${REPO}/issues/new?labels=topic-request&title=${encodeURIComponent('[주제추가] ')}&body=${body}`;
+}
+
+// ── 디자인 설정 이슈 프리필
+{
+  const dbody = encodeURIComponent(
+`바꾸고 싶은 항목만 남기고 나머지 줄은 지워도 됩니다. 등록하면 자동으로 design.json에 반영되고 다음 발행부터 적용됩니다.
+
+채널이름: 유플리
+핸들: @uplus_uply
+메인컬러: #E6007E
+보조컬러: #7B2BD9
+시리즈: 신모델=#E6007E, 혜택=#7B2BD9, 꿀팁=#0BA394`);
+  $('btn-design').href = `https://github.com/${REPO}/issues/new?labels=design-request&title=${encodeURIComponent('[디자인설정] ')}&body=${dbody}`;
 }
 
 // ── 데이터 로드
@@ -164,7 +178,7 @@ async function j(url){ const r = await fetch(url + (url.includes('?')?'&':'?') +
     const items = Array.isArray(t) ? t : (t.topics||[]);
     const wait = items.filter(x => x.status==='대기');
     $('t-topics').textContent = wait.length;
-    $('t-topics-d').textContent = '주 5회 기준 약 ' + (wait.length/5).toFixed(1) + '주분';
+    $('t-topics-d').textContent = '주 3회 기준 약 ' + (wait.length/3).toFixed(1) + '주분';
     $('topics').innerHTML = wait.map(x =>
       `<div class="topic"><span class="s">${x.series||''} ${x.issueNo||''}</span><span>${x.topic||''}</span></div>`
     ).join('') || '<div class="sub">대기 주제가 없습니다 — 일요일 밤 자동 보충 예정</div>';

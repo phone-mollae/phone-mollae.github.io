@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* 사장님몰래 — Instagram Graph API 캐러셀 자동 게시
+/* 유플리 — Instagram Graph API 캐러셀 자동 게시
  * 사용법: node publish_carousel.js <포스트폴더>   (폴더에 card1..N.png + caption.txt)
  * 필요 env (.env 파일 또는 환경변수):
  *   IG_USER_ID      - Instagram 비즈니스 계정 ID

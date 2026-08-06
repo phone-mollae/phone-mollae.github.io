@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* 사장님몰래 — Instagram Graph API 릴스 자동 게시
+/* 유플리 — Instagram Graph API 릴스 자동 게시
  * 사용법: node publish_reel.js <포스트폴더>   (폴더에 reel.mp4 + caption.txt)
  * 필요 env: IG_USER_ID / IG_ACCESS_TOKEN / IMG_BASE_URL (publish_carousel.js와 동일)
  * reel.mp4는 실행 전에 IMG_BASE_URL 아래에 공개 업로드되어 있어야 한다.

@@ -1,0 +1,23 @@
+{
+  "brand": {
+    "name": "유플리",
+    "accent_from_char": 1,
+    "logo_letter": "U",
+    "handle": "@uplus_uply",
+    "tagline": "매주 통신 소식을 알기 쉽게 정리해드려요"
+  },
+  "colors": {
+    "bg_from": "#FFFFFF",
+    "bg_mid": "#FFF2F8",
+    "bg_to": "#FDE7F1",
+    "ink": "#221A2E",
+    "ink_soft": "#4A4356",
+    "accent_from": "#E6007E",
+    "accent_to": "#7B2BD9"
+  },
+  "series": {
+    "신모델": { "color": "#E6007E", "en": "NEW" },
+    "혜택":   { "color": "#7B2BD9", "en": "BENEFIT" },
+    "꿀팁":   { "color": "#0BA394", "en": "TIP" }
+  }
+}
