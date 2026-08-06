@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* 원장님몰래 — 콘텐츠 자동 생성 (Claude API)
+/* 사장님몰래 — 콘텐츠 자동 생성 (Claude API)
  * topics.json에서 '대기' 주제를 꺼내 → Claude API(웹서치 포함)로 post.json 생성
  * → posts/YYYY-MM-DD/ 에 저장하고 topics.json 상태 갱신.
  * 필요 env: ANTHROPIC_API_KEY  (선택: MODEL, 기본 claude-sonnet-4-5)
@@ -21,14 +21,14 @@ const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 const outDir = path.join(root, 'posts', today);
 
 const SCHEMA_EXAMPLE = {
-  series: 'MONEY CUT', issueNo: '#002', brand: '원장님{c}몰래{/c}',
+  series: 'TRUTH CUT', issueNo: '#002', brand: '사장님{c}몰래{/c}',
   cards: [
     { type: 'cover', headline: '한 줄씩 줄바꿈한\n후킹 헤드라인\n**형광 강조**', headlineSize: 92 },
     { type: 'content', title: '소제목', text: '본문. **마커 강조**와 <b>흰색 강조</b> 사용, \\n\\n 단락 구분' },
     { type: 'content', title: '체크리스트형 소제목', points: ['항목 1 **강조**', '항목 2', '항목 3', '항목 4'] },
     { type: 'cta', title: 'CTA 소제목', text: 'CTA 본문\n**강조**', sub: '프로필 링크 안내', disclaimer: '면책 문구' },
   ],
-  caption: '캡션 본문 + 해시태그 15개 (#원장님몰래 포함)',
+  caption: '캡션 본문 + 해시태그 15개 (#사장님몰래 포함)',
 };
 
 async function main() {
@@ -46,7 +46,7 @@ async function main() {
       tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 5 }],
       messages: [{
         role: 'user',
-        content: `너는 미용인 대상 인스타 정보지 '원장님몰래'의 콘텐츠 에디터다.
+        content: `너는 통신 소비자 대상 인스타 정보지 '사장님몰래'의 콘텐츠 에디터다. 화자는 휴대폰 매장에서 일하는 익명의 현직 판매인 — 소비자 편에 서서 구조를 알려주는 내부자다.
 
 ## 운영 가이드 (가드레일 반드시 준수)
 ${guide}
@@ -61,7 +61,7 @@ ${guide}
 2. 카드뉴스 post.json을 작성하라. 표지 1장 + 본문 2~3장 + CTA 1장. 아래 스키마를 정확히 따르라:
 ${JSON.stringify(SCHEMA_EXAMPLE, null, 2)}
 
-규칙: **텍스트**는 형광 마커 강조, <b>텍스트</b>는 흰색 굵게. 카드 본문에 특정 연·월 표기 금지(현재형 프레이밍). 법률·세무 주제면 CTA 카드에 disclaimer 필수. 캡션 끝에 출처 표기와 해시태그(#원장님몰래 포함 15개 내외).
+규칙: **텍스트**는 형광 마커 강조, <b>텍스트</b>는 흰색 굵게. 카드 본문에 특정 연·월 표기 금지(현재형 프레이밍). 법률·세무 주제면 CTA 카드에 disclaimer 필수. 캡션 끝에 출처 표기와 해시태그(#사장님몰래 포함 15개 내외).
 
 응답은 post.json의 JSON만 출력하라. 코드블록 없이 순수 JSON.`,
       }],
@@ -72,7 +72,7 @@ ${JSON.stringify(SCHEMA_EXAMPLE, null, 2)}
   const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
   const jsonStr = text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
   const post = JSON.parse(jsonStr);
-  post.series = todo.series; post.issueNo = todo.issueNo; post.brand = '원장님{c}몰래{/c}';
+  post.series = todo.series; post.issueNo = todo.issueNo; post.brand = '사장님{c}몰래{/c}';
 
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(path.join(outDir, 'post.json'), JSON.stringify(post, null, 2));

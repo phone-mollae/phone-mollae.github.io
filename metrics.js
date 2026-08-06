@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* 원장님몰래 — 계정·게시물 지표 수집 → stats.json 누적
+/* 사장님몰래 — 계정·게시물 지표 수집 → stats.json 누적
  * 매일 metrics.yml이 실행. 필요 env: IG_USER_ID, IG_ACCESS_TOKEN
  */
 const fs = require('fs');

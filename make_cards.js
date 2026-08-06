@@ -8,15 +8,15 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const SERIES = {
-  'MONEY CUT':   { color: '#3DF2B6', desc: '돈·계약' },
+  'TRUTH CUT':   { color: '#4DA8FF', desc: '가격·구조' },
   'DATA CUT':    { color: '#FFE14D', desc: '통계·트렌드' },
-  'COUNTER CUT': { color: '#FF5A36', desc: '오피니언' },
+  'GUARD CUT':   { color: '#FF5A36', desc: '소비자 방어' },
 };
 
 const post = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const outDir = process.argv[3] || 'out';
 fs.mkdirSync(outDir, { recursive: true });
-const S = SERIES[post.series] || SERIES['MONEY CUT'];
+const S = SERIES[post.series] || SERIES['TRUTH CUT'];
 
 /* hl() : **텍스트** → 형광 마커 하이라이트 */
 const hl = t => t
@@ -31,7 +31,7 @@ function cardHTML(card, idx, total) {
   html,body { width:1080px; height:1350px; }
   body {
     font-family: "Noto Sans CJK KR", sans-serif;
-    background:#101012; color:#fff;
+    background:#0E0F12; color:#fff;
     display:flex; flex-direction:column;
     padding:72px 76px 64px;
     position:relative; overflow:hidden;
