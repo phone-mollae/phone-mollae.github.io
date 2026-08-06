@@ -1,0 +1,68 @@
+name: 디자인 자동 반영 (design-request 이슈)
+on:
+  issues:
+    types: [opened]
+permissions:
+  contents: write
+  issues: write
+jobs:
+  apply:
+    if: contains(github.event.issue.labels.*.name, 'design-request')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 이슈 파싱 후 design.json 반영
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+            const body = context.payload.issue.body || '';
+            const pick = k => (body.match(new RegExp(k + '\\s*[:：]\\s*(.+)')) || [])[1]?.trim();
+            const isHex = v => /^#[0-9A-Fa-f]{6}$/.test(v || '');
+            const D = JSON.parse(fs.readFileSync('design.json','utf8'));
+            const changed = [], errors = [];
+
+            const name = pick('채널이름');
+            if (name && name !== D.brand.name) { D.brand.name = name; D.brand.accent_from_char = Math.min(1, name.length - 1) || 1; changed.push('채널이름 → ' + name); }
+            const handle = pick('핸들');
+            if (handle) { const h = handle.startsWith('@') ? handle : '@' + handle; if (h !== D.brand.handle) { D.brand.handle = h; changed.push('핸들 → ' + h); } }
+            const c1 = pick('메인컬러');
+            if (c1) { if (isHex(c1)) { if (c1 !== D.colors.accent_from) { D.colors.accent_from = c1; changed.push('메인컬러 → ' + c1); } } else errors.push('메인컬러 형식 오류: ' + c1); }
+            const c2 = pick('보조컬러');
+            if (c2) { if (isHex(c2)) { if (c2 !== D.colors.accent_to) { D.colors.accent_to = c2; changed.push('보조컬러 → ' + c2); } } else errors.push('보조컬러 형식 오류: ' + c2); }
+            const sr = pick('시리즈');
+            if (sr) {
+              const pairs = sr.split(',').map(x => x.trim()).filter(Boolean);
+              const next = {};
+              let ok = true;
+              for (const p of pairs) {
+                const m = p.match(/^(.+?)\s*=\s*(#[0-9A-Fa-f]{6})$/);
+                if (!m) { errors.push('시리즈 형식 오류: ' + p + ' ("이름=#색상" 형태여야 합니다)'); ok = false; break; }
+                const prev = D.series[m[1].trim()] || {};
+                next[m[1].trim()] = { color: m[2], en: prev.en || '' };
+              }
+              if (ok && Object.keys(next).length) {
+                const before = JSON.stringify(D.series);
+                D.series = next;
+                if (before !== JSON.stringify(next)) changed.push('시리즈 → ' + Object.entries(next).map(([k,v]) => k + '=' + v.color).join(', '));
+              }
+            }
+
+            if (errors.length) {
+              await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number,
+                body: '⚠️ 반영 실패:\n- ' + errors.join('\n- ') + '\n\n수정 후 새 이슈로 다시 등록해주세요.' });
+              return;
+            }
+            if (!changed.length) {
+              await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number,
+                body: 'ℹ️ 변경된 값이 없습니다. 바꾸고 싶은 항목의 값을 수정해서 다시 등록해주세요.' });
+              await github.rest.issues.update({ ...context.repo, issue_number: context.issue.number, state: 'closed' });
+              return;
+            }
+            fs.writeFileSync('design.json', JSON.stringify(D, null, 2) + '\n');
+            execSync('git config user.name design-bot && git config user.email actions@github.com');
+            execSync('git add design.json && git commit -m "디자인 설정 변경 (대시보드)" && git push');
+            await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number,
+              body: '✅ 디자인 설정 반영 완료 — 다음 발행부터 적용됩니다.\n\n- ' + changed.join('\n- ') + (sr ? '\n\n⚠️ 시리즈 이름을 바꾼 경우, 대기 중인 주제의 시리즈명도 같은 이름으로 맞춰야 색상이 매칭됩니다.' : '') });
+            await github.rest.issues.update({ ...context.repo, issue_number: context.issue.number, state: 'closed' });
