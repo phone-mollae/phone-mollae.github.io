@@ -1,14 +1,12 @@
 #!/usr/bin/env node
-/* 유플리 — 주제 큐 자동 보충 (Claude API 웹서치)
+/* 유플리 — 주제 큐 자동 보충 (LLM 웹서치)
  * topics.json의 '대기' 주제가 MIN_QUEUE개 미만이면 웹서치 리서치로 ADD_COUNT개를 생성해 추가한다.
- * 실행: collect_topics.yml (매주 일요일 21:17 KST) 또는 수동 실행. 필요 env: ANTHROPIC_API_KEY
+ * 실행: collect_topics.yml (매주 일요일 21:17 KST) 또는 수동 실행.
+ * 필요 env: OPENAI_API_KEY(GPT 우선) 또는 ANTHROPIC_API_KEY(Claude 폴백)
  */
 const fs = require('fs');
 const path = require('path');
-
-const KEY = process.env.ANTHROPIC_API_KEY;
-if (!KEY) { console.error('ANTHROPIC_API_KEY 필요'); process.exit(1); }
-const MODEL = process.env.MODEL || 'claude-sonnet-4-5';
+const { generate } = require('./llm');
 const MIN_QUEUE = parseInt(process.env.MIN_QUEUE || '6', 10);
 const ADD_COUNT = parseInt(process.env.ADD_COUNT || '6', 10);
 const root = __dirname;
@@ -30,20 +28,7 @@ function nextIssueNo(series) {
 }
 
 async function main() {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': KEY,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 4000,
-      tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 8 }],
-      messages: [{
-        role: 'user',
-        content: `너는 인스타 통신 정보 채널 '유플리'의 편집장이다.
+  const text = await generate(`너는 인스타 통신 정보 채널 '유플리'의 편집장이다.
 
 ## 운영 가이드 (가드레일 반드시 준수)
 ${guide}
@@ -58,13 +43,7 @@ ${existingList}
 - note에는 핵심 메시지와 근거(출처 매체명 포함)를 적어라. 웹서치로 확인 안 되는 수치는 쓰지 마라.
 
 응답은 JSON 배열만 출력하라. 코드블록 없이:
-[{"series":"신모델","topic":"주제","note":"핵심 메시지 / 근거·출처"}]`,
-      }],
-    }),
-  });
-  const data = await res.json();
-  if (data.error) throw new Error(JSON.stringify(data.error));
-  const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+[{"series":"신모델","topic":"주제","note":"핵심 메시지 / 근거·출처"}]`);
   const jsonStr = text.slice(text.indexOf('['), text.lastIndexOf(']') + 1);
   const newTopics = JSON.parse(jsonStr);
   let added = 0;

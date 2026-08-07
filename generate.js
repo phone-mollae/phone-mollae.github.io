@@ -1,15 +1,13 @@
 #!/usr/bin/env node
-/* 유플리 — 콘텐츠 자동 생성 (Claude API)
- * topics.json에서 '대기' 주제를 꺼내 → Claude API(웹서치 포함)로 post.json 생성
+/* 유플리 — 콘텐츠 자동 생성
+ * topics.json에서 '대기' 주제를 꺼내 → LLM(웹서치 포함)으로 post.json 생성
  * → posts/YYYY-MM-DD/ 에 저장하고 topics.json 상태 갱신.
- * 필요 env: ANTHROPIC_API_KEY  (선택: MODEL, 기본 claude-sonnet-4-5)
+ * 필요 env: OPENAI_API_KEY(GPT 우선) 또는 ANTHROPIC_API_KEY(Claude 폴백). 선택: MODEL
  */
 const fs = require('fs');
 const path = require('path');
+const { generate } = require('./llm');
 
-const KEY = process.env.ANTHROPIC_API_KEY;
-if (!KEY) { console.error('ANTHROPIC_API_KEY 필요'); process.exit(1); }
-const MODEL = process.env.MODEL || 'claude-sonnet-4-5';
 const root = __dirname;
 
 const topics = JSON.parse(fs.readFileSync(path.join(root, 'topics.json'), 'utf8'));
@@ -33,20 +31,7 @@ const SCHEMA_EXAMPLE = {
 
 async function main() {
   console.log(`주제: [${todo.series} ${todo.issueNo}] ${todo.topic}`);
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': KEY,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 4000,
-      tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 5 }],
-      messages: [{
-        role: 'user',
-        content: `너는 인스타 통신 정보 채널 '유플리'의 콘텐츠 에디터다. 유플리는 통신 소식을 알기 쉽게 정리해주는 친절한 큐레이터다 — 밝고 단정한 존댓말, 과장 없는 정보 전달.
+  const text = await generate(`너는 인스타 통신 정보 채널 '유플리'의 콘텐츠 에디터다. 유플리는 통신 소식을 알기 쉽게 정리해주는 친절한 큐레이터다 — 밝고 단정한 존댓말, 과장 없는 정보 전달.
 
 ## 운영 가이드 (가드레일 반드시 준수)
 ${guide}
@@ -63,13 +48,7 @@ ${JSON.stringify(SCHEMA_EXAMPLE, null, 2)}
 
 규칙: **텍스트**는 포인트 컬러 강조, <b>텍스트</b>는 진한 굵게. 표지에는 kicker(주제 라벨 한 줄)를 넣어라. 카드 본문에 특정 연·월 표기 금지(현재형 프레이밍). 법률·세무 주제면 CTA 카드에 disclaimer 필수. 캡션 끝에 출처 표기와 해시태그(#유플리 포함 15개 내외).
 
-응답은 post.json의 JSON만 출력하라. 코드블록 없이 순수 JSON.`,
-      }],
-    }),
-  });
-  const data = await res.json();
-  if (data.error) throw new Error(JSON.stringify(data.error));
-  const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+응답은 post.json의 JSON만 출력하라. 코드블록 없이 순수 JSON.`);
   const jsonStr = text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
   const post = JSON.parse(jsonStr);
   post.series = todo.series; post.issueNo = todo.issueNo; 
