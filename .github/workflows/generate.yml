@@ -34,6 +34,7 @@ jobs:
       - name: 콘텐츠 생성 (Claude API)
         if: steps.guard.outputs.skip == 'false'
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node generate.js
       - name: 카드 렌더링

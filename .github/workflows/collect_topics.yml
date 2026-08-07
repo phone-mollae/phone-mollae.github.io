@@ -16,6 +16,7 @@ jobs:
         with: { node-version: 20 }
       - name: 주제 리서치 + 큐 보충 (Claude API 웹서치)
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           MIN_QUEUE: '8'
           ADD_COUNT: '8'
