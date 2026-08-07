@@ -16,8 +16,21 @@
     "accent_to": "#7B2BD9"
   },
   "series": {
-    "신모델": { "color": "#E6007E", "en": "NEW" },
-    "혜택":   { "color": "#7B2BD9", "en": "BENEFIT" },
-    "꿀팁":   { "color": "#0BA394", "en": "TIP" }
+    "신모델": {
+      "color": "#E6007E",
+      "en": "NEW"
+    },
+    "혜택": {
+      "color": "#7B2BD9",
+      "en": "BENEFIT"
+    },
+    "꿀팁": {
+      "color": "#0BA394",
+      "en": "TIP"
+    }
+  },
+  "formats": {
+    "carousel": true,
+    "reel": false
   }
 }
