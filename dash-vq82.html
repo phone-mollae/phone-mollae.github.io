@@ -123,6 +123,23 @@ td a{color:var(--brand);font-weight:700}
   margin-top:6px;font-size:11.5px;color:var(--ink-3);font-weight:600}
 .foot a{color:var(--ink-2);font-weight:700}
 
+/* modal form */
+.mback{position:fixed;inset:0;background:rgba(28,21,35,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.mback.on{display:flex}
+.modal{background:var(--surface);border-radius:22px;box-shadow:var(--sh-md);width:100%;max-width:430px;padding:26px 26px 22px}
+.modal h3{font-size:16px;font-weight:800;margin-bottom:16px}
+.modal label{display:block;font-size:12px;font-weight:700;color:var(--ink-3);margin:12px 0 5px}
+.modal input,.modal select,.modal textarea{width:100%;font:inherit;font-size:14px;font-weight:600;color:var(--ink-1);
+  padding:11px 13px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface-2);outline:none}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--brand)}
+.modal textarea{min-height:150px;resize:vertical;font-family:inherit}
+.mrow{display:flex;gap:10px;margin-top:18px}
+.mrow .btn{flex:1;justify-content:center;padding:11px}
+.msg{font-size:12.5px;font-weight:700;margin-top:12px;display:none}
+.msg.ok{color:var(--good);display:block}
+.msg.err{color:var(--crit);display:block}
+.ghlink{display:block;text-align:center;font-size:11px;color:var(--ink-3);font-weight:600;margin-top:10px}
+
 @media (max-width:880px){
   .tiles{grid-template-columns:repeat(2,1fr)}
   .grid{grid-template-columns:1fr}
@@ -207,6 +224,47 @@ td a{color:var(--brand);font-weight:700}
   </div>
 </div>
 
+<!-- 주제 추가 모달 -->
+<div class="mback" id="m-topic">
+  <div class="modal">
+    <h3>＋ 주제 추가 <span style="font-size:11px;color:var(--ink-3);font-weight:600">로그인 필요 없음</span></h3>
+    <label>시리즈</label>
+    <select id="f-series"><option>신모델</option><option>혜택</option><option>꿀팁</option></select>
+    <label>주제 (한 줄)</label>
+    <input id="f-topic" placeholder="예: 갤럭시 S26 사전예약 총정리" maxlength="120">
+    <label>메모 (선택)</label>
+    <input id="f-note" placeholder="참고 링크나 방향" maxlength="300">
+    <label>접수 코드</label>
+    <input id="f-code" placeholder="매장 접수 코드" maxlength="20">
+    <div class="msg" id="f-msg"></div>
+    <div class="mrow">
+      <button class="btn" onclick="closeModal('m-topic')">취소</button>
+      <button class="btn primary" id="f-submit" onclick="submitTopic()">등록</button>
+    </div>
+    <a class="ghlink" id="gh-topic" target="_blank" rel="noopener">GitHub 계정이 있다면 이슈로 직접 등록 →</a>
+  </div>
+</div>
+
+<!-- 디자인 설정 모달 -->
+<div class="mback" id="m-design">
+  <div class="modal">
+    <h3>🎨 디자인 설정 <span style="font-size:11px;color:var(--ink-3);font-weight:600">로그인 필요 없음</span></h3>
+    <label>바꿀 항목만 남기고 나머지 줄은 지워도 됩니다</label>
+    <textarea id="d-body">채널이름: 유플리
+핸들: @uplus_uply
+메인컬러: #E6007E
+보조컬러: #7B2BD9
+시리즈: 신모델=#E6007E, 혜택=#7B2BD9, 꿀팁=#0BA394</textarea>
+    <label>접수 코드</label>
+    <input id="d-code" placeholder="매장 접수 코드" maxlength="20">
+    <div class="msg" id="d-msg"></div>
+    <div class="mrow">
+      <button class="btn" onclick="closeModal('m-design')">취소</button>
+      <button class="btn primary" id="d-submit" onclick="submitDesign()">등록</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const REPO = 'phone-mollae/phone-mollae.github.io';
 const $ = id => document.getElementById(id);
@@ -214,26 +272,49 @@ const fmt = n => n==null ? '–' : n.toLocaleString('ko-KR');
 const kstNow = () => new Date(Date.now() + 9*3600*1000);
 const kstDate = () => kstNow().toISOString().slice(0,10);
 
-// ── 버튼 프리필
+// ── 로그인 없는 접수 폼 (웹훅)
+const WEBHOOK = 'https://script.google.com/macros/s/AKfycby06PMnfWYEieqPAmoeaou0mtH6LdYtW2Xv9Zg6x6aUrFYpqBXAax2JlfOXo7DFkLMI6w/exec';
+function openModal(id){ document.getElementById(id).classList.add('on');
+  const c = localStorage.getItem('uply_code'); if(c){ const f=$('f-code'),d=$('d-code'); if(f)f.value=c; if(d)d.value=c; } }
+function closeModal(id){ document.getElementById(id).classList.remove('on'); }
+document.querySelectorAll('.mback').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('on'); }));
+$('btn-add').onclick = e=>{ e.preventDefault(); openModal('m-topic'); };
+$('btn-add2').onclick = ()=>openModal('m-topic');
+$('btn-design').onclick = e=>{ e.preventDefault(); openModal('m-design'); };
+
+async function callHook(payload, msgEl, btnEl){
+  msgEl.className='msg'; btnEl.disabled=true; btnEl.textContent='등록 중…';
+  try{
+    const r = await fetch(WEBHOOK,{method:'POST',body:JSON.stringify(payload)});
+    const j = await r.json();
+    btnEl.disabled=false; btnEl.textContent='등록';
+    if(j.ok){ localStorage.setItem('uply_code', payload.code); return j; }
+    msgEl.textContent='⚠️ '+(j.error||'등록 실패'); msgEl.className='msg err'; return null;
+  }catch(e){
+    btnEl.disabled=false; btnEl.textContent='등록';
+    msgEl.textContent='⚠️ 네트워크 오류 — 잠시 후 다시 시도해주세요'; msgEl.className='msg err'; return null;
+  }
+}
+async function submitTopic(){
+  const topic=$('f-topic').value.trim(), code=$('f-code').value.trim(), msg=$('f-msg');
+  if(!topic){ msg.textContent='⚠️ 주제를 입력해주세요'; msg.className='msg err'; return; }
+  if(!code){ msg.textContent='⚠️ 접수 코드를 입력해주세요'; msg.className='msg err'; return; }
+  const j = await callHook({code, kind:'topic', series:$('f-series').value, topic, note:$('f-note').value.trim()}, msg, $('f-submit'));
+  if(j){ msg.innerHTML='✅ 등록 완료! 잠시 후 자동으로 큐에 반영됩니다.'; msg.className='msg ok';
+    $('f-topic').value=''; $('f-note').value='';
+    setTimeout(()=>{ closeModal('m-topic'); location.reload(); }, 2200); }
+}
+async function submitDesign(){
+  const body=$('d-body').value.trim(), code=$('d-code').value.trim(), msg=$('d-msg');
+  if(!code){ msg.textContent='⚠️ 접수 코드를 입력해주세요'; msg.className='msg err'; return; }
+  const j = await callHook({code, kind:'design', body}, msg, $('d-submit'));
+  if(j){ msg.innerHTML='✅ 등록 완료! 다음 발행부터 적용됩니다.'; msg.className='msg ok';
+    setTimeout(()=>closeModal('m-design'), 2200); }
+}
+// GitHub 직접 등록 폴백 링크
 {
-  const body = encodeURIComponent(
-`아래 형식을 채워 그대로 등록하세요. 등록하면 자동으로 주제 큐(topics.json)에 추가됩니다.
-
-시리즈: 신모델   (신모델 / 혜택 / 꿀팁 중 하나)
-주제: 여기에 주제 한 줄
-메모: (선택) 참고 링크나 방향`);
-  const addUrl = `https://github.com/${REPO}/issues/new?labels=topic-request&title=${encodeURIComponent('[주제추가] ')}&body=${body}`;
-  $('btn-add').href = addUrl;
-  $('btn-add2').onclick = () => window.open(addUrl, '_blank');
-  const dbody = encodeURIComponent(
-`바꾸고 싶은 항목만 남기고 나머지 줄은 지워도 됩니다. 등록하면 자동으로 design.json에 반영되고 다음 발행부터 적용됩니다.
-
-채널이름: 유플리
-핸들: @uplus_uply
-메인컬러: #E6007E
-보조컬러: #7B2BD9
-시리즈: 신모델=#E6007E, 혜택=#7B2BD9, 꿀팁=#0BA394`);
-  $('btn-design').href = `https://github.com/${REPO}/issues/new?labels=design-request&title=${encodeURIComponent('[디자인설정] ')}&body=${dbody}`;
+  const body = encodeURIComponent(`아래 형식을 채워 그대로 등록하세요.\n\n시리즈: 신모델   (신모델 / 혜택 / 꿀팁 중 하나)\n주제: 여기에 주제 한 줄\n메모: (선택)`);
+  $('gh-topic').href = `https://github.com/${REPO}/issues/new?labels=topic-request&title=${encodeURIComponent('[주제추가] ')}&body=${body}`;
 }
 
 // ── 발행 스케줄 카드
