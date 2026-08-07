@@ -29,6 +29,8 @@ const S = { color: SD.color, soft: soften(SD.color), en: SD.en || '' };
 const C = D.colors;
 const nameA = D.brand.name.slice(0, D.brand.accent_from_char);
 const nameB = D.brand.name.slice(D.brand.accent_from_char);
+const LOGO_IMG = D.brand.logo_image && fs.existsSync(path.join(root, D.brand.logo_image))
+  ? 'file://' + path.resolve(root, D.brand.logo_image) : null;
 
 const hl = t => t
   .replace(/\*\*(.+?)\*\*/g, `<em>$1</em>`)
@@ -58,6 +60,7 @@ function cardHTML(card, idx, total) {
     display:flex; align-items:center; justify-content:center;
     color:#fff; font-size:26px; font-weight:900; }
   .logo b { color:${C.accent_from}; }
+  .logoimg { height:52px; width:auto; }
   .series { font-weight:800; font-size:26px;
     color:${S.color}; background:#fff; border:2.5px solid ${S.color};
     padding:10px 26px; border-radius:999px; }
@@ -96,7 +99,7 @@ function cardHTML(card, idx, total) {
   </style></head><body>
   <div class="blob b1"></div><div class="blob b2"></div>
   <div class="top">
-    <span class="logo"><span class="dot">${D.brand.logo_letter}</span>${nameA}<b>${nameB}</b></span>
+    ${LOGO_IMG ? `<img class="logoimg" src="${LOGO_IMG}" alt="">` : `<span class="logo"><span class="dot">${D.brand.logo_letter}</span>${nameA}<b>${nameB}</b></span>`}
     <span class="series">${post.series}${S.en ? ` · ${S.en}` : ''}</span>
   </div>
   <div class="body">

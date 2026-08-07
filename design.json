@@ -4,7 +4,8 @@
     "accent_from_char": 1,
     "logo_letter": "U",
     "handle": "@uplus_uply",
-    "tagline": "매주 통신 소식을 알기 쉽게 정리해드려요"
+    "tagline": "매주 통신 소식을 알기 쉽게 정리해드려요",
+    "logo_image": "assets/uply_logo.png"
   },
   "colors": {
     "bg_from": "#FFFFFF",
