@@ -3,124 +3,218 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow">
 <title>유플리 · 운영 대시보드</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-  .viz-root {
-    color-scheme: light;
-    --surface-1:#fcfcfb; --page:#f9f9f7;
-    --ink-1:#0b0b0b; --ink-2:#52514e; --ink-3:#898781;
-    --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
-    --series-1:#2a78d6;
-    --st-good:#0ca30c; --st-warn:#fab219; --st-serious:#ec835a; --st-crit:#d03b3b;
-    --delta-good:#006300;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:where(:not([data-theme="light"])) .viz-root {
-      color-scheme: dark;
-      --surface-1:#1a1a19; --page:#0d0d0d;
-      --ink-1:#ffffff; --ink-2:#c3c2b7; --ink-3:#898781;
-      --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
-      --series-1:#3987e5; --delta-good:#0ca30c;
-    }
-  }
-  * { box-sizing:border-box; margin:0; }
-  body.viz-root { background:var(--page); color:var(--ink-1);
-    font-family:system-ui,-apple-system,"Segoe UI",sans-serif; padding:20px; }
-  .wrap { max-width:880px; margin:0 auto; display:grid; gap:14px; }
-  header { display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px; }
-  h1 { font-size:18px; font-weight:700; }
-  .sub { font-size:12px; color:var(--ink-3); }
-  .card { background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:16px; }
-  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
-  .tile .k { font-size:12px; color:var(--ink-2); margin-bottom:6px; }
-  .tile .v { font-size:26px; font-weight:700; line-height:1.1; }
-  .tile .d { font-size:12px; color:var(--ink-3); margin-top:4px; }
-  .d .up { color:var(--delta-good); font-weight:600; }
-  h2 { font-size:13px; font-weight:700; color:var(--ink-2); margin-bottom:10px; }
-  .status { display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:15px; }
-  .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
-  table { width:100%; border-collapse:collapse; font-size:13px; }
-  th { text-align:left; color:var(--ink-3); font-weight:600; font-size:11px; padding:6px 8px; border-bottom:1px solid var(--grid); }
-  td { padding:7px 8px; border-bottom:1px solid var(--grid); font-variant-numeric:tabular-nums; }
-  td a { color:var(--series-1); text-decoration:none; }
-  .num { text-align:right; }
-  .btnrow { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-  .btn { display:inline-block; padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600;
-    text-decoration:none; border:1px solid var(--border); color:var(--ink-1); background:transparent; }
-  .btn.primary { background:var(--series-1); color:#fff; border-color:transparent; }
-  .btn.danger { color:var(--st-crit); border-color:var(--st-crit); }
-  .chartbox { position:relative; }
-  #tip { position:absolute; pointer-events:none; background:var(--surface-1); border:1px solid var(--border);
-    border-radius:6px; padding:6px 9px; font-size:12px; display:none; box-shadow:0 2px 8px rgba(0,0,0,.12); white-space:nowrap; }
-  #tip b { font-variant-numeric:tabular-nums; }
-  .topic { display:flex; gap:8px; padding:7px 0; border-bottom:1px solid var(--grid); font-size:13px; align-items:baseline; }
-  .topic .s { color:var(--ink-3); font-size:11px; min-width:110px; }
-  .foot { font-size:12px; color:var(--ink-3); display:flex; gap:14px; flex-wrap:wrap; }
-  .foot a { color:var(--ink-2); }
-  .tgl { font-size:12px; color:var(--ink-3); background:none; border:none; cursor:pointer; text-decoration:underline; padding:0; }
-  .hidden { display:none; }
+:root{
+  --bg:#FBF7FA; --surface:#FFFFFF; --surface-2:#FDF4F9;
+  --ink-1:#1C1523; --ink-2:#5B5266; --ink-3:#9C93A8;
+  --line:#F0E4EC; --grid:#F3EAF1; --axis:#DCCDD8;
+  --brand:#E6007E; --brand-2:#7B2BD9; --teal:#0BA394;
+  --brand-soft:#FDE7F1; --brand2-soft:#F0E9FC; --teal-soft:#E3F6F4;
+  --good:#1A9E77; --good-soft:#E2F5EE; --warn:#C77700; --warn-soft:#FCF0DC; --crit:#D64550; --crit-soft:#FCE9EA;
+  --sh-sm:0 1px 2px rgba(28,21,35,.04),0 4px 14px rgba(28,21,35,.05);
+  --sh-md:0 2px 6px rgba(28,21,35,.05),0 14px 40px rgba(28,21,35,.08);
+  --r:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',system-ui,sans-serif;
+  background:
+    radial-gradient(900px 420px at 88% -10%, rgba(230,0,126,.07), transparent 60%),
+    radial-gradient(700px 380px at -8% 8%, rgba(123,43,217,.06), transparent 55%),
+    var(--bg);
+  color:var(--ink-1); min-height:100vh; padding:22px clamp(14px,3vw,36px) 48px;
+  font-feature-settings:'tnum';
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1140px;margin:0 auto}
+
+/* ── top bar ── */
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:13px}
+.brand img{height:34px;display:block}
+.brand .t b{display:block;font-size:16.5px;font-weight:800;letter-spacing:-.01em}
+.brand .t span{font-size:12px;color:var(--ink-3);font-weight:600}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;
+  padding:9px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);
+  box-shadow:var(--sh-sm);cursor:pointer;transition:.15s;color:var(--ink-1)}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--sh-md)}
+.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border:none}
+.btn.ghost{background:transparent;border-color:transparent;box-shadow:none;color:var(--ink-2)}
+.btn.ghost:hover{background:var(--surface);transform:none}
+
+/* ── stat tiles ── */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:20px 22px 18px;box-shadow:var(--sh-sm);position:relative;overflow:hidden}
+.tile .k{font-size:12.5px;font-weight:700;color:var(--ink-3);letter-spacing:.01em;display:flex;align-items:center;gap:6px}
+.tile .k .ic{width:26px;height:26px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:13px}
+.tile .v{font-size:clamp(24px,2.6vw,31px);font-weight:800;letter-spacing:-.02em;margin-top:9px;line-height:1.1}
+.tile .d{font-size:12px;color:var(--ink-3);margin-top:6px;font-weight:600}
+.tile .d .up{color:var(--good);font-weight:800}
+.tile .d .down{color:var(--crit);font-weight:800}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;
+  padding:5px 12px;border-radius:999px;margin-top:8px}
+.pill .dot{width:7px;height:7px;border-radius:50%}
+.pill.good{background:var(--good-soft);color:var(--good)} .pill.good .dot{background:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.warn .dot{background:var(--warn)}
+.pill.crit{background:var(--crit-soft);color:var(--crit)} .pill.crit .dot{background:var(--crit)}
+
+/* ── cards ── */
+.grid{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh-sm);padding:22px 24px;margin-bottom:14px}
+.card h2{font-size:14.5px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card h2 .mini{font-size:11.5px;color:var(--ink-3);font-weight:600}
+.card h2 .lnk{font-size:12px;color:var(--brand);font-weight:700;cursor:pointer}
+.sub{font-size:12.5px;color:var(--ink-3);font-weight:600}
+
+/* chart */
+.chartbox{position:relative;margin-top:14px}
+#chart{width:100%;height:190px;display:block}
+.tip{position:absolute;pointer-events:none;display:none;background:var(--ink-1);color:#fff;
+  font-size:12px;font-weight:600;padding:7px 11px;border-radius:9px;white-space:nowrap;box-shadow:var(--sh-md)}
+.tip b{font-weight:800}
+.empty{padding:34px 10px;text-align:center;color:var(--ink-3);font-size:13px;font-weight:600;line-height:1.8}
+.empty .big{font-size:26px;display:block;margin-bottom:6px}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+th{color:var(--ink-3);font-weight:700;text-align:left;font-size:11.5px;padding:7px 8px;border-bottom:1px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid var(--grid);font-weight:600;color:var(--ink-2)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td a{color:var(--brand);font-weight:700}
+.hidden{display:none}
+
+/* posts list */
+.post{display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid var(--grid)}
+.post:last-child{border-bottom:none}
+.post .type{font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;flex:none}
+.type.card-t{background:var(--brand-soft);color:var(--brand)}
+.type.reel-t{background:var(--brand2-soft);color:var(--brand-2)}
+.post .date{font-size:12.5px;color:var(--ink-3);font-weight:700;flex:none;width:74px}
+.post .stats{margin-left:auto;display:flex;gap:12px;font-size:12.5px;font-weight:700;color:var(--ink-2);flex:none}
+.post .stats span b{font-weight:800;color:var(--ink-1)}
+.post .go{color:var(--brand);font-weight:800;font-size:12.5px;flex:none}
+
+/* topics */
+.topic{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--grid);font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.topic:last-child{border-bottom:none}
+.topic .n{flex:none;width:20px;text-align:center;font-size:11.5px;color:var(--ink-3);font-weight:800}
+.chip{flex:none;font-size:11px;font-weight:800;padding:4px 11px;border-radius:999px}
+.chip.s1{background:var(--brand-soft);color:var(--brand)}
+.chip.s2{background:var(--brand2-soft);color:var(--brand-2)}
+.chip.s3{background:var(--teal-soft);color:var(--teal)}
+.chip.s0{background:#F1EEF4;color:var(--ink-2)}
+
+/* schedule */
+.sched{display:flex;gap:8px;margin-top:13px}
+.day{flex:1;text-align:center;border-radius:14px;padding:12px 4px 10px;background:var(--surface-2);
+  border:1px solid var(--line);font-weight:700}
+.day .w{font-size:12px;color:var(--ink-3)}
+.day .m{font-size:11px;margin-top:3px;color:var(--ink-3)}
+.day.on{background:linear-gradient(135deg,var(--brand-soft),var(--brand2-soft));border-color:transparent}
+.day.on .w{color:var(--brand)}
+.day.today{outline:2px solid var(--brand);outline-offset:1px}
+
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-top:6px;font-size:11.5px;color:var(--ink-3);font-weight:600}
+.foot a{color:var(--ink-2);font-weight:700}
+
+@media (max-width:880px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .grid{grid-template-columns:1fr}
+  .post .date{width:auto}
+}
 </style>
 </head>
-<body class="viz-root">
+<body>
 <div class="wrap">
-  <header>
-    <h1>유플리 · 운영 대시보드</h1>
-    <span class="sub" id="asof">불러오는 중…</span>
-  </header>
+
+  <div class="top">
+    <a class="brand" href="https://www.instagram.com/uplus_uply/" target="_blank" rel="noopener">
+      <img src="assets/uply_logo.png" alt="유플리">
+      <span class="t"><b>운영 대시보드</b><span id="asof">데이터 불러오는 중…</span></span>
+    </a>
+    <div class="actions">
+      <a class="btn primary" id="btn-add" target="_blank" rel="noopener">＋ 주제 추가</a>
+      <a class="btn" id="btn-design" target="_blank" rel="noopener">🎨 디자인</a>
+      <a class="btn" id="btn-stop" target="_blank" rel="noopener">⏸ 오늘 발행 중지</a>
+      <a class="btn ghost" href="https://www.instagram.com/uplus_uply/" target="_blank" rel="noopener">인스타 ↗</a>
+    </div>
+  </div>
 
   <div class="tiles">
-    <div class="card tile"><div class="k">팔로워</div><div class="v" id="t-fol">–</div><div class="d" id="t-fol-d"></div></div>
-    <div class="card tile"><div class="k">오늘 발행</div><div class="v" style="font-size:15px;margin-top:5px"><span class="status" id="t-pub"><span class="dot" style="background:var(--ink-3)"></span>확인 중</span></div><div class="d" id="t-pub-d"></div></div>
-    <div class="card tile"><div class="k">누적 게시물</div><div class="v" id="t-media">–</div><div class="d">카드+릴스</div></div>
-    <div class="card tile"><div class="k">대기 주제</div><div class="v" id="t-topics">–</div><div class="d" id="t-topics-d"></div></div>
-  </div>
-
-  <div class="card">
-    <h2>팔로워 추이 <button class="tgl" id="tgl-tbl">표로 보기</button></h2>
-    <div class="chartbox"><svg id="chart" width="100%" height="180" role="img" aria-label="팔로워 추이 선 차트"></svg><div id="tip"></div></div>
-    <table id="fol-table" class="hidden"><thead><tr><th>날짜</th><th class="num">팔로워</th></tr></thead><tbody></tbody></table>
-  </div>
-
-  <div class="card">
-    <h2>오늘 콘텐츠</h2>
-    <div id="today-links" style="font-size:13px; color:var(--ink-2)">확인 중…</div>
-    <div class="btnrow">
-      <a class="btn danger" id="btn-stop" target="_blank" rel="noopener">⛔ 오늘 발행 중지 (이슈에 stop 댓글)</a>
-      <a class="btn" href="https://github.com/phone-mollae/phone-mollae.github.io/actions" target="_blank" rel="noopener">실행 로그</a>
+    <div class="tile">
+      <span class="k"><span class="ic" style="background:var(--brand-soft)">👥</span>팔로워</span>
+      <div class="v" id="t-fol">–</div>
+      <div class="d" id="t-fol-d">지표 수집 대기</div>
+    </div>
+    <div class="tile">
+      <span class="k"><span class="ic" style="background:var(--brand2-soft)">🖼️</span>총 게시물</span>
+      <div class="v" id="t-media">–</div>
+      <div class="d">인스타 전체 기준</div>
+    </div>
+    <div class="tile">
+      <span class="k"><span class="ic" style="background:var(--teal-soft)">🗂️</span>대기 주제</span>
+      <div class="v" id="t-topics">–</div>
+      <div class="d" id="t-topics-d">큐 로드 중</div>
+    </div>
+    <div class="tile">
+      <span class="k"><span class="ic" style="background:var(--good-soft)">🚀</span>오늘 발행</span>
+      <div id="t-pub" class="pill warn"><span class="dot"></span>확인 중</div>
+      <div class="d" id="t-pub-d"></div>
     </div>
   </div>
 
-  <div class="card">
-    <h2>최근 게시물 반응</h2>
-    <table id="media-table"><thead><tr><th>게시일</th><th>형식</th><th class="num">좋아요</th><th class="num">댓글</th><th>링크</th></tr></thead><tbody></tbody></table>
-  </div>
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2>팔로워 추이 <span class="lnk" id="tgl-tbl">표로 보기</span></h2>
+        <div class="chartbox">
+          <svg id="chart" role="img" aria-label="팔로워 추이 차트"></svg>
+          <div class="tip" id="tip"></div>
+          <div class="empty hidden" id="chart-empty"><span class="big">🌱</span>아직 지표가 없어요.<br>매일 밤 9시에 자동으로 쌓입니다 — 내일부터 그래프가 그려져요.</div>
+        </div>
+        <table id="fol-table" class="hidden"><thead><tr><th>날짜</th><th class="num">팔로워</th></tr></thead><tbody></tbody></table>
+      </div>
 
-  <div class="card">
-    <h2>주제 큐</h2>
-    <div id="topics"></div>
-    <div class="btnrow">
-      <a class="btn primary" id="btn-add" target="_blank" rel="noopener">＋ 주제 추가</a>
-      <a class="btn" id="btn-design" target="_blank" rel="noopener">🎨 디자인 설정</a>
-      <a class="btn" href="https://github.com/phone-mollae/phone-mollae.github.io/edit/main/topics.json" target="_blank" rel="noopener">직접 편집 (고급)</a>
+      <div class="card">
+        <h2>최근 게시물 반응 <span class="mini">좋아요 · 댓글</span></h2>
+        <div id="media-list"><div class="empty"><span class="big">📊</span>첫 지표 수집(매일 21:07) 후에 표시됩니다.</div></div>
+      </div>
     </div>
-    <div class="sub" style="margin-top:8px">주제 추가 버튼 → 양식이 채워진 이슈가 열립니다. 그대로 등록하면 자동으로 큐에 반영됩니다.</div>
+
+    <div>
+      <div class="card">
+        <h2>발행 스케줄 <span class="mini">10:07 KST 자동</span></h2>
+        <div class="sched" id="sched"></div>
+        <div class="sub" style="margin-top:12px">내용이 이상한 날은 아침 <b>발행 예고 이슈</b>에 <b>stop</b> 댓글 → 그날 발행 취소</div>
+      </div>
+
+      <div class="card">
+        <h2>대기 주제 큐 <span class="lnk" id="btn-add2">＋ 추가</span></h2>
+        <div id="topics"><div class="empty">불러오는 중…</div></div>
+      </div>
+    </div>
   </div>
 
-  <div class="card foot">
-    <a href="https://www.instagram.com/uplus_uply/" target="_blank" rel="noopener">@uplus_uply</a>
-    <a href="https://github.com/phone-mollae/phone-mollae.github.io" target="_blank" rel="noopener">저장소</a>
-    <span id="runinfo"></span>
+  <div class="foot">
+    <span id="runinfo">·</span>
+    <span><a href="https://github.com/phone-mollae/phone-mollae.github.io" target="_blank" rel="noopener">저장소</a> · <a href="https://github.com/phone-mollae/phone-mollae.github.io/issues" target="_blank" rel="noopener">이슈</a> · 매주 월·수·금 무인 발행</span>
   </div>
 </div>
 
 <script>
 const REPO = 'phone-mollae/phone-mollae.github.io';
-const kstDate = () => new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
-const fmt = n => n==null ? '–' : n.toLocaleString('ko-KR');
 const $ = id => document.getElementById(id);
+const fmt = n => n==null ? '–' : n.toLocaleString('ko-KR');
+const kstNow = () => new Date(Date.now() + 9*3600*1000);
+const kstDate = () => kstNow().toISOString().slice(0,10);
 
-// ── 주제 추가 이슈 프리필
+// ── 버튼 프리필
 {
   const body = encodeURIComponent(
 `아래 형식을 채워 그대로 등록하세요. 등록하면 자동으로 주제 큐(topics.json)에 추가됩니다.
@@ -128,11 +222,9 @@ const $ = id => document.getElementById(id);
 시리즈: 신모델   (신모델 / 혜택 / 꿀팁 중 하나)
 주제: 여기에 주제 한 줄
 메모: (선택) 참고 링크나 방향`);
-  $('btn-add').href = `https://github.com/${REPO}/issues/new?labels=topic-request&title=${encodeURIComponent('[주제추가] ')}&body=${body}`;
-}
-
-// ── 디자인 설정 이슈 프리필
-{
+  const addUrl = `https://github.com/${REPO}/issues/new?labels=topic-request&title=${encodeURIComponent('[주제추가] ')}&body=${body}`;
+  $('btn-add').href = addUrl;
+  $('btn-add2').onclick = () => window.open(addUrl, '_blank');
   const dbody = encodeURIComponent(
 `바꾸고 싶은 항목만 남기고 나머지 줄은 지워도 됩니다. 등록하면 자동으로 design.json에 반영되고 다음 발행부터 적용됩니다.
 
@@ -144,13 +236,25 @@ const $ = id => document.getElementById(id);
   $('btn-design').href = `https://github.com/${REPO}/issues/new?labels=design-request&title=${encodeURIComponent('[디자인설정] ')}&body=${dbody}`;
 }
 
+// ── 발행 스케줄 카드
+{
+  const days = ['일','월','화','수','목','금','토'];
+  const pubDays = [1,3,5];
+  const today = kstNow().getUTCDay();
+  $('sched').innerHTML = days.map((w,i) =>
+    `<div class="day${pubDays.includes(i)?' on':''}${i===today?' today':''}">
+      <div class="w">${w}</div><div class="m">${pubDays.includes(i)?'발행':'–'}</div></div>`).join('');
+}
+
 // ── 데이터 로드
 async function j(url){ const r = await fetch(url + (url.includes('?')?'&':'?') + 'v=' + Date.now()); if(!r.ok) throw r.status; return r.json(); }
 
 (async () => {
+  // stats.json — 팔로워·게시물·최근 반응
   try {
     const s = await j('stats.json');
     const snaps = Array.isArray(s) ? s : (s.snapshots||[]);
+    if (!snaps.length) throw 'empty';
     const byDay = {};
     snaps.forEach(x => byDay[x.at.slice(0,10)] = x);
     const days = Object.keys(byDay).sort();
@@ -159,87 +263,102 @@ async function j(url){ const r = await fetch(url + (url.includes('?')?'&':'?') +
     $('t-fol').textContent = fmt(last.followers);
     if (pts.length >= 2) {
       const diff = last.followers - pts[pts.length-2].f;
-      $('t-fol-d').innerHTML = diff >= 0 ? `전일 대비 <span class="up">＋${diff}</span>` : `전일 대비 ${diff}`;
-    }
+      $('t-fol-d').innerHTML = diff >= 0 ? `전일 대비 <span class="up">▲ ${diff}</span>` : `전일 대비 <span class="down">▼ ${-diff}</span>`;
+    } else $('t-fol-d').textContent = '내일부터 증감 표시';
     $('t-media').textContent = fmt(last.media_count);
-    $('asof').textContent = '데이터 기준: ' + last.at.replace('T',' ').slice(0,16) + ' UTC';
+    $('asof').textContent = '기준 ' + last.at.replace('T',' ').slice(5,16) + ' UTC';
     drawChart(pts);
-    const tb = $('fol-table').querySelector('tbody');
-    tb.innerHTML = pts.map(p=>`<tr><td>${p.d}</td><td class="num">${fmt(p.f)}</td></tr>`).join('');
-    const mb = $('media-table').querySelector('tbody');
-    mb.innerHTML = (last.media||[]).map(m=>{
-      const t = m.type==='VIDEO' ? '릴스' : '카드';
-      return `<tr><td>${m.ts.slice(0,10)}</td><td>${t}</td><td class="num">${fmt(m.likes)}</td><td class="num">${fmt(m.comments)}</td><td><a href="${m.permalink}" target="_blank" rel="noopener">보기 ↗</a></td></tr>`;
+    $('fol-table').querySelector('tbody').innerHTML =
+      pts.map(p=>`<tr><td>${p.d}</td><td class="num">${fmt(p.f)}</td></tr>`).join('');
+    const media = (last.media||[]).slice(0,7);
+    if (media.length) $('media-list').innerHTML = media.map(m=>{
+      const isReel = m.type==='VIDEO';
+      return `<div class="post">
+        <span class="type ${isReel?'reel-t':'card-t'}">${isReel?'릴스':'카드'}</span>
+        <span class="date">${m.ts.slice(5,10).replace('-','.')}</span>
+        <span class="stats"><span>❤️ <b>${fmt(m.likes)}</b></span><span>💬 <b>${fmt(m.comments)}</b></span></span>
+        <a class="go" href="${m.permalink}" target="_blank" rel="noopener">보기 ↗</a>
+      </div>`;
     }).join('');
-  } catch(e) { $('asof').textContent = 'stats.json 로드 실패'; }
+  } catch(e) {
+    $('chart').style.display='none';
+    $('chart-empty').classList.remove('hidden');
+    $('asof').textContent = '지표 수집 전';
+  }
 
+  // topics.json — 대기 큐
   try {
     const t = await j('topics.json');
     const items = Array.isArray(t) ? t : (t.topics||[]);
     const wait = items.filter(x => x.status==='대기');
     $('t-topics').textContent = wait.length;
     $('t-topics-d').textContent = '주 3회 기준 약 ' + (wait.length/3).toFixed(1) + '주분';
-    $('topics').innerHTML = wait.map(x =>
-      `<div class="topic"><span class="s">${x.series||''} ${x.issueNo||''}</span><span>${x.topic||''}</span></div>`
-    ).join('') || '<div class="sub">대기 주제가 없습니다 — 일요일 밤 자동 보충 예정</div>';
-  } catch(e) {}
+    const cls = s => s==='신모델'?'s1':s==='혜택'?'s2':s==='꿀팁'?'s3':'s0';
+    $('topics').innerHTML = wait.slice(0,8).map((x,i) =>
+      `<div class="topic"><span class="n">${i+1}</span><span class="chip ${cls(x.series)}">${x.series||'기타'}</span><span>${x.topic||''}</span></div>`
+    ).join('') || '<div class="empty">대기 주제가 없어요 — 일요일 밤 자동 보충 예정</div>';
+  } catch(e) { $('topics').innerHTML = '<div class="empty">큐 로드 실패</div>'; }
 
+  // 오늘 발행 상태
   const today = kstDate();
   try {
     const p = await j(`posts/${today}/published.json`);
-    setPub('good', '발행 완료', (p.carousel?.at||'').replace('T',' ').slice(11,16) + ' UTC');
-    const links = [];
-    if (p.carousel?.permalink) links.push(`<a href="${p.carousel.permalink}" target="_blank" rel="noopener">오늘 카드 ↗</a>`);
-    if (p.reel?.permalink) links.push(`<a href="${p.reel.permalink}" target="_blank" rel="noopener">오늘 릴스 ↗</a>`);
-    $('today-links').innerHTML = links.join(' · ') || '기록 없음';
+    setPub('good','발행 완료', (p.carousel?.at||'').slice(11,16) + ' UTC');
+    if (p.carousel?.permalink) $('t-pub-d').innerHTML = `<a href="${p.carousel.permalink}" target="_blank" rel="noopener" style="color:var(--brand);font-weight:800">오늘 게시물 보기 ↗</a>`;
   } catch(e) {
-    const h = new Date(Date.now()+9*3600*1000).getUTCHours();
-    if (h < 10) setPub('warn', '발행 전', '10:07 예정');
-    else if (h < 13) setPub('warn', '진행 중/대기', '10:07~12:43 슬롯');
-    else setPub('crit', '미발행', '점검 필요');
-    $('today-links').textContent = '오늘자 발행 기록이 아직 없습니다.';
+    const h = kstNow().getUTCHours(), wd = kstNow().getUTCDay();
+    if (![1,3,5].includes(wd)) setPub('warn','발행일 아님','다음: 월·수·금 10:07');
+    else if (h < 10) setPub('warn','발행 전','오늘 10:07 예정');
+    else if (h < 13) setPub('warn','진행 중','10:07~12:43 슬롯');
+    else setPub('crit','미발행','점검 필요');
   }
   function setPub(kind, label, sub){
-    const c = kind==='good' ? 'var(--st-good)' : kind==='warn' ? 'var(--st-warn)' : 'var(--st-crit)';
-    const i = kind==='good' ? '✅' : kind==='warn' ? '⏳' : '❌';
-    $('t-pub').innerHTML = `<span class="dot" style="background:${c}"></span>${i} ${label}`;
-    $('t-pub-d').textContent = sub;
+    $('t-pub').className = 'pill ' + kind;
+    $('t-pub').innerHTML = `<span class="dot"></span>${label}`;
+    if (sub && !$('t-pub-d').innerHTML) $('t-pub-d').textContent = sub;
   }
 
+  // 발행 중지 버튼 → 오늘 publish-queue 이슈
   try {
     const iss = await j(`https://api.github.com/repos/${REPO}/issues?state=open&labels=publish-queue`);
     $('btn-stop').href = iss.length ? iss[0].html_url : `https://github.com/${REPO}/issues?q=label%3Apublish-queue`;
-    if (!iss.length) { $('btn-stop').textContent = '발행 대기 이슈 없음 (이미 처리됨)'; }
+    if (!iss.length) $('btn-stop').style.opacity = .55;
   } catch(e) { $('btn-stop').href = `https://github.com/${REPO}/issues`; }
+
+  // 최근 실행
   try {
     const r = await j(`https://api.github.com/repos/${REPO}/actions/workflows/publish.yml/runs?per_page=1`);
     const run = r.workflow_runs?.[0];
-    if (run) $('runinfo').textContent = `최근 게시 실행: ${run.conclusion||run.status} (${run.created_at.replace('T',' ').slice(0,16)} UTC)`;
+    if (run) $('runinfo').textContent = `최근 게시 실행 ${run.conclusion==='success'?'✓ 성공':(run.conclusion||run.status)} · ${run.created_at.replace('T',' ').slice(5,16)} UTC`;
   } catch(e) {}
 })();
 
+// ── 팔로워 차트 (단일 시리즈 area+line, crosshair 툴팁)
 function drawChart(pts){
   const svg = $('chart'), tip = $('tip');
-  const W = svg.clientWidth || 820, H = 180, m = {t:12, r:12, b:22, l:40};
+  const W = svg.clientWidth || 700, H = 190, m = {t:14, r:14, b:24, l:42};
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const xs = i => m.l + (W-m.l-m.r) * (pts.length===1 ? .5 : i/(pts.length-1));
   const fmin = Math.min(...pts.map(p=>p.f)), fmax = Math.max(...pts.map(p=>p.f));
   const lo = Math.max(0, Math.floor((fmin-5)/10)*10), hi = Math.ceil((fmax+5)/10)*10;
   const ys = v => m.t + (H-m.t-m.b) * (1 - (v-lo)/(hi-lo||1));
-  const css = v => getComputedStyle(document.body).getPropertyValue(v).trim();
-  let g = '';
+  let g = `<defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#E6007E" stop-opacity=".18"/>
+    <stop offset="1" stop-color="#E6007E" stop-opacity="0"/></linearGradient></defs>`;
   for (let k=0;k<=2;k++){ const v = lo + (hi-lo)*k/2, y = ys(v);
-    g += `<line x1="${m.l}" y1="${y}" x2="${W-m.r}" y2="${y}" stroke="${css('--grid')}" stroke-width="1"/>`;
-    g += `<text x="${m.l-6}" y="${y+4}" text-anchor="end" font-size="10" fill="${css('--ink-3')}" font-variant-numeric="tabular-nums">${v}</text>`; }
+    g += `<line x1="${m.l}" y1="${y}" x2="${W-m.r}" y2="${y}" stroke="#F3EAF1" stroke-width="1"/>`;
+    g += `<text x="${m.l-7}" y="${y+4}" text-anchor="end" font-size="10" fill="#9C93A8">${v}</text>`; }
   const step = Math.max(1, Math.ceil(pts.length/6));
   pts.forEach((p,i)=>{ if(i%step===0 || i===pts.length-1)
-    g += `<text x="${xs(i)}" y="${H-6}" text-anchor="middle" font-size="10" fill="${css('--ink-3')}">${p.d.slice(5)}</text>`; });
-  const path = pts.map((p,i)=>`${i?'L':'M'}${xs(i)},${ys(p.f)}`).join('');
-  g += `<path d="${path}" fill="none" stroke="${css('--series-1')}" stroke-width="2" stroke-linejoin="round"/>`;
+    g += `<text x="${xs(i)}" y="${H-7}" text-anchor="middle" font-size="10" fill="#9C93A8">${p.d.slice(5)}</text>`; });
+  const line = pts.map((p,i)=>`${i?'L':'M'}${xs(i)},${ys(p.f)}`).join('');
+  if (pts.length > 1)
+    g += `<path d="${line} L${xs(pts.length-1)},${ys(lo)} L${xs(0)},${ys(lo)} Z" fill="url(#ar)"/>`;
+  g += `<path d="${line}" fill="none" stroke="#E6007E" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
   const li = pts.length-1;
-  g += `<circle cx="${xs(li)}" cy="${ys(pts[li].f)}" r="4" fill="${css('--series-1')}" stroke="${css('--surface-1')}" stroke-width="2"/>`;
-  g += `<text x="${Math.min(xs(li), W-m.r-8)}" y="${ys(pts[li].f)-9}" text-anchor="end" font-size="11" font-weight="600" fill="${css('--ink-1')}">${pts[li].f}</text>`;
-  g += `<line id="xh" x1="0" y1="${m.t}" x2="0" y2="${H-m.b}" stroke="${css('--axis')}" stroke-width="1" visibility="hidden"/>`;
+  g += `<circle cx="${xs(li)}" cy="${ys(pts[li].f)}" r="4.5" fill="#E6007E" stroke="#fff" stroke-width="2"/>`;
+  g += `<text x="${Math.min(xs(li), W-m.r-6)}" y="${ys(pts[li].f)-10}" text-anchor="end" font-size="11.5" font-weight="700" fill="#1C1523">${pts[li].f}</text>`;
+  g += `<line id="xh" x1="0" y1="${m.t}" x2="0" y2="${H-m.b}" stroke="#DCCDD8" stroke-width="1" visibility="hidden"/>`;
   svg.innerHTML = g;
   const xh = svg.querySelector('#xh');
   svg.addEventListener('mousemove', ev => {
@@ -248,16 +367,16 @@ function drawChart(pts){
     pts.forEach((p,i)=>{ const d = Math.abs(xs(i)-x); if(d<bd){bd=d;bi=i;} });
     xh.setAttribute('x1', xs(bi)); xh.setAttribute('x2', xs(bi)); xh.setAttribute('visibility','visible');
     tip.style.display='block';
-    tip.innerHTML = `${pts[bi].d} · 팔로워 <b>${pts[bi].f}</b>`;
+    tip.innerHTML = `${pts[bi].d} · 팔로워 <b>${fmt(pts[bi].f)}</b>`;
     const bx = svg.parentElement.getBoundingClientRect();
-    tip.style.left = Math.min(ev.clientX-bx.left+12, bx.width-140)+'px';
-    tip.style.top  = (ev.clientY-bx.top-34)+'px';
+    tip.style.left = Math.min(ev.clientX-bx.left+12, bx.width-150)+'px';
+    tip.style.top  = (ev.clientY-bx.top-36)+'px';
   });
   svg.addEventListener('mouseleave', ()=>{ xh.setAttribute('visibility','hidden'); tip.style.display='none'; });
 }
 $('tgl-tbl').addEventListener('click', ()=>{
-  const t = $('fol-table'), on = t.classList.toggle('hidden');
-  $('tgl-tbl').textContent = on ? '표로 보기' : '차트만 보기';
+  const t = $('fol-table'), shown = !t.classList.toggle('hidden');
+  $('tgl-tbl').textContent = shown ? '차트만 보기' : '표로 보기';
 });
 </script>
 </body>
