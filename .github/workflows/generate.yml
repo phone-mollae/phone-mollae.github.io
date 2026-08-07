@@ -46,7 +46,12 @@ jobs:
         if: steps.guard.outputs.skip == 'false'
         run: |
           POST_DIR=$(cat .last_post_dir)
-          CHROME_BIN=$(which google-chrome) node make_reel.js "$POST_DIR/post.json" "$POST_DIR"
+          REEL=$(node -p "(require('./design.json').formats||{}).reel === false ? 'off' : 'on'")
+          if [ "$REEL" = "on" ]; then
+            CHROME_BIN=$(which google-chrome) node make_reel.js "$POST_DIR/post.json" "$POST_DIR"
+          else
+            echo "릴스 생성 건너뜀 (design.json formats.reel=false)"
+          fi
           rm -f "$POST_DIR"/frame*.png
       - name: 커밋
         if: steps.guard.outputs.skip == 'false'
